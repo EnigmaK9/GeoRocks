@@ -60,8 +60,8 @@ All changes are immediately saved to the Room Database and reflected in the UI.
 
 ## Screenshots
 
-![App Screenshot 1](screenshots/01screen.png)
-![App Screenshot 2](screenshots/02screen.png)
+![App Screenshot 1](screenshots/01screen.jpg)
+![App Screenshot 2](screenshots/02screen.jpg)
 
 ## Future Enhancements
 
