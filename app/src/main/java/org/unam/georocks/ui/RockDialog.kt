@@ -1,27 +1,27 @@
 package org.unam.georocks.ui
 
 import android.app.AlertDialog
-import android.app.AlertDialog.Builder
 import android.app.Dialog
-import android.content.DialogInterface
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
+import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.Toast
+import android.widget.ImageView
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
-import org.unam.georocks.R
-import org.unam.georocks.application.GeoRocksDBApp
-import org.unam.georocks.data.RocksRepository
-import org.unam.georocks.data.db.model.RockEntity
-import org.unam.georocks.databinding.RockDialogBinding
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.unam.georocks.R
+import org.unam.georocks.application.GeoRocksDBApp
+import org.unam.georocks.data.RocksRepository
+import org.unam.georocks.data.db.model.RockEntity
+import org.unam.georocks.databinding.RockDialogBinding
 import java.io.IOException
+import android.text.Editable
+import android.text.TextWatcher
+import android.widget.Toast
 
 class RockDialog(
     private val newRock: Boolean = true,
@@ -41,114 +41,98 @@ class RockDialog(
     private lateinit var dialog: Dialog
 
     private var saveButton: Button? = null
+    private var rockImageView: ImageView? = null
 
     private lateinit var repository: RocksRepository
 
-    // This is where the dialog is created and initially configured
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         _binding = RockDialogBinding.inflate(requireActivity().layoutInflater)
-
-        // Get an instance of the repository inside the dialog fragment
         repository = (requireContext().applicationContext as GeoRocksDBApp).repository
 
         builder = AlertDialog.Builder(requireContext())
 
-        // Set the values of the rock object in the text input fields
+        val rockTypes = arrayOf("Igneous", "Sedimentary", "Metamorphic")
+        val typeAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, rockTypes)
+        typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerRockType.adapter = typeAdapter
+
+        val rockOrigins = arrayOf("Volcanic", "Plutonic", "Metamorphic")
+        val originAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, rockOrigins)
+        originAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerRockOrigin.adapter = originAdapter
+
+        binding.spinnerRockType.setSelection(rockTypes.indexOf(rock.type).takeIf { it >= 0 } ?: 0)
+        binding.spinnerRockOrigin.setSelection(rockOrigins.indexOf(rock.origin).takeIf { it >= 0 } ?: 0)
+
+        rockImageView = binding.ivHeader
+        updateRockIcon(binding.spinnerRockOrigin.selectedItem.toString())
+
         binding.apply {
             tietName.setText(rock.name)
-            tietType.setText(rock.type)
-            tietOrigin.setText(rock.origin)
         }
 
         dialog = if (newRock)
             buildDialog("Save", "Cancel", {
-                // Save action
-
-                // Get the entered texts and assign them to the rock object
                 binding.apply {
                     rock.apply {
                         name = tietName.text.toString()
-                        type = tietType.text.toString()
-                        origin = tietOrigin.text.toString()
+                        type = binding.spinnerRockType.selectedItem?.toString() ?: "Unknown"
+                        origin = binding.spinnerRockOrigin.selectedItem?.toString() ?: "Unknown"
                     }
                 }
 
+                updateRockIcon(rock.origin)
+
                 try {
                     lifecycleScope.launch(Dispatchers.IO) {
-                        val result = async {
-                            repository.insertRock(rock)
-                        }
-
-                        // Wait for this action to complete before proceeding
+                        val result = async { repository.insertRock(rock) }
                         result.await()
-
-                        // Dispatch message and updateUI actions to the main thread
                         withContext(Dispatchers.Main) {
                             message("Rock saved successfully")
-
                             updateUI()
                         }
                     }
                 } catch (e: IOException) {
                     message("Error saving the rock")
                 }
-
             }, {
-                // Cancel action
             })
         else
             buildDialog("Update", "Delete", {
-                // Update action
-
-                // Get the entered texts and assign them to the rock object
                 binding.apply {
                     rock.apply {
                         name = tietName.text.toString()
-                        type = tietType.text.toString()
-                        origin = tietOrigin.text.toString()
+                        type = binding.spinnerRockType.selectedItem?.toString() ?: "Unknown"
+                        origin = binding.spinnerRockOrigin.selectedItem?.toString() ?: "Unknown"
                     }
                 }
 
+                updateRockIcon(rock.origin)
+
                 try {
                     lifecycleScope.launch(Dispatchers.IO) {
-                        val result = async {
-                            repository.updateRock(rock)
-                        }
-
+                        val result = async { repository.updateRock(rock) }
                         result.await()
-
                         withContext(Dispatchers.Main) {
                             message("Rock updated successfully")
-
                             updateUI()
                         }
                     }
                 } catch (e: IOException) {
                     message("Error updating the rock")
                 }
-
             }, {
-                // Delete action
-
-                // Store context in a variable before launching the new dialog
                 val context = requireContext()
-
                 AlertDialog.Builder(requireContext())
                     .setTitle("Confirmation")
                     .setMessage("Are you sure you want to delete the rock ${rock.name}?")
-                    // Do you really want to delete the rock %1$s?
                     .setPositiveButton("Confirm") { _, _ ->
                         try {
                             lifecycleScope.launch(Dispatchers.IO) {
-                                val result = async {
-                                    repository.deleteRock(rock)
-                                }
-
+                                val result = async { repository.deleteRock(rock) }
                                 result.await()
-
                                 withContext(Dispatchers.Main) {
                                     message("Rock deleted successfully")
-
                                     updateUI()
                                 }
                             }
@@ -165,43 +149,37 @@ class RockDialog(
         return dialog
     }
 
-    // This is called when the dialog is destroyed
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
     }
 
-    // Called after the dialog is displayed on screen
     override fun onStart() {
         super.onStart()
-
-        // Since the Dialog class doesn't allow direct access to its buttons
         val alertDialog = dialog as AlertDialog
-
         saveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-
         saveButton?.isEnabled = false
-
         binding.apply {
-            setupTextWatcher(
-                tietName,
-                tietType,
-                tietOrigin
-            )
+            setupTextWatcher(tietName)
+        }
+    }
+
+    private fun updateRockIcon(rockType: String) {
+        when (rockType) {
+            "Volcanic" -> rockImageView?.setImageResource(R.drawable.volcanic)
+            "Plutonic" -> rockImageView?.setImageResource(R.drawable.plutonic)
+            "Metamorphic" -> rockImageView?.setImageResource(R.drawable.metamorphic)
+            else -> rockImageView?.setImageResource(R.drawable.gamepad)
         }
     }
 
     private fun validateFields(): Boolean =
-        binding.tietName.text.toString().isNotEmpty() &&
-                binding.tietType.text.toString().isNotEmpty() &&
-                binding.tietOrigin.text.toString().isNotEmpty()
+        binding.tietName.text.toString().isNotEmpty()
 
     private fun setupTextWatcher(vararg textFields: TextInputEditText) {
         val textWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
             override fun afterTextChanged(s: Editable?) {
                 saveButton?.isEnabled = validateFields()
             }
@@ -220,14 +198,7 @@ class RockDialog(
     ): Dialog =
         builder.setView(binding.root)
             .setTitle("Rock")
-            .setPositiveButton(btn1Text) { _, _ ->
-                // Action for the positive button
-                positiveButton()
-            }
-            .setNegativeButton(btn2Text) { _, _ ->
-                // Action for the negative button
-                negativeButton()
-            }
+            .setPositiveButton(btn1Text) { _, _ -> positiveButton() }
+            .setNegativeButton(btn2Text) { _, _ -> negativeButton() }
             .create()
-
 }

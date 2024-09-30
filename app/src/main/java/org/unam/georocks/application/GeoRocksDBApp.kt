@@ -4,14 +4,13 @@ import android.app.Application
 import org.unam.georocks.data.RocksRepository
 import org.unam.georocks.data.db.RocksDatabase
 
-class GeoRocksDBApp: Application() {
+class GeoRocksDBApp : Application() {
 
-    private val database by lazy{
-        RocksDatabase.getDatabase(this@GeoRocksDBApp)
+    private val database by lazy {
+        RocksDatabase.getDatabase(this)
     }
 
     val repository by lazy {
         RocksRepository(database.rocksDao())
     }
-
 }

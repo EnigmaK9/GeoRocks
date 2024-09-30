@@ -22,8 +22,6 @@ class RockAdapter(
     override fun onBindViewHolder(holder: RockViewHolder, position: Int) {
         val rock = rocks[position]
         holder.bind(rock)
-
-        // Handle click on the item
         holder.itemView.setOnClickListener {
             onRockClicked(rock)
         }
