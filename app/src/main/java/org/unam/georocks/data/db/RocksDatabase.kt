@@ -14,7 +14,7 @@ import org.unam.georocks.util.Constants
 )
 abstract class RocksDatabase : RoomDatabase() {
     // Here goes the DAO
-    abstract fun rocksDao(): RocksDao
+    abstract fun rocksDao(): rocksDao
 
     // Without dependency injection, we instantiate the database
     // here with a singleton pattern

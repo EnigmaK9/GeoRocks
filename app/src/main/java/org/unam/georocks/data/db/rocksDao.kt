@@ -9,7 +9,7 @@ import org.unam.georocks.data.db.model.RockEntity
 import org.unam.georocks.util.Constants
 
 @Dao
-interface RocksDao {
+interface rocksDao {
 
     //Funciones para interactuar con la base de datos
 

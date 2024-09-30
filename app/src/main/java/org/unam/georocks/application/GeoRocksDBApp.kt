@@ -11,7 +11,7 @@ class GeoRocksDBApp: Application() {
     }
 
     val repository by lazy {
-        RocksRepository(database.RocksDao())
+        RocksRepository(database.rocksDao())
     }
 
 }

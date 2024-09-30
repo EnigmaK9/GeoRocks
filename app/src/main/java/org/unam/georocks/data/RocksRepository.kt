@@ -1,10 +1,10 @@
 package org.unam.georocks.data
 
-import org.unam.georocks.data.db.RocksDao
+import org.unam.georocks.data.db.rocksDao
 import org.unam.georocks.data.db.model.RockEntity
 
 class RocksRepository(
-    private val rocksDao: RocksDao
+    private val rocksDao: rocksDao
 ) {
 
     suspend fun insertRock(rock: RockEntity) {
