@@ -25,6 +25,7 @@
         android:layout_marginBottom="8dp"
         android:hint="Rock Name"
         app:boxBackgroundMode="outline"
+        app:boxStrokeColor="#8B7D6B"
         app:boxCornerRadiusBottomEnd="16dp"
         app:boxCornerRadiusBottomStart="16dp"
         app:boxCornerRadiusTopEnd="16dp"
@@ -37,9 +38,8 @@
             android:layout_height="wrap_content"
             android:imeOptions="actionDone"
             android:inputType="text"
-            android:maxLines="1">
-
-        </com.google.android.material.textfield.TextInputEditText>
+            android:maxLines="1"
+            android:textColor="#4B3621" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -54,11 +54,12 @@
         android:layout_marginBottom="8dp"
         android:hint="Rock Type"
         app:boxBackgroundMode="outline"
+        app:boxStrokeColor="#8B7D6B"
         app:boxCornerRadiusBottomEnd="16dp"
         app:boxCornerRadiusBottomStart="16dp"
         app:boxCornerRadiusTopEnd="16dp"
         app:boxCornerRadiusTopStart="16dp"
-        app:startIconDrawable="@drawable/ic_type">
+        app:startIconDrawable="@drawable/ic_genre">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/tietType"
@@ -66,9 +67,8 @@
             android:layout_height="wrap_content"
             android:imeOptions="actionDone"
             android:inputType="text"
-            android:maxLines="1">
-
-        </com.google.android.material.textfield.TextInputEditText>
+            android:maxLines="1"
+            android:textColor="#4B3621" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -83,11 +83,12 @@
         android:layout_marginBottom="8dp"
         android:hint="Rock Origin"
         app:boxBackgroundMode="outline"
+        app:boxStrokeColor="#8B7D6B"
         app:boxCornerRadiusBottomEnd="16dp"
         app:boxCornerRadiusBottomStart="16dp"
         app:boxCornerRadiusTopEnd="16dp"
         app:boxCornerRadiusTopStart="16dp"
-        app:startIconDrawable="@drawable/ic_origin">
+        app:startIconDrawable="@drawable/ic_developer">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/tietOrigin"
@@ -95,9 +96,8 @@
             android:layout_height="wrap_content"
             android:imeOptions="actionDone"
             android:inputType="text"
-            android:maxLines="1">
-
-        </com.google.android.material.textfield.TextInputEditText>
+            android:maxLines="1"
+            android:textColor="#4B3621" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
